@@ -42,54 +42,43 @@
     </div>
     <div class="eight wide column">
       <div id="chart_2">
+				<p>Events by depth [km]</p>
       </div>
 			<div id="chart_3">
+				<p>Events by magnitude</p>
+			</div>
+			<div id="chart_4">
+				<p>Events by hour</p>
 			</div>
     </div>
   </div>
 	<!--second row-->
 	<div class="ui grid" style="margin:0 0 0 0;">
 		<div class="eight wide column">
-			<div id="chart_4">
+			<div id="chart_5">
 			</div>
 		</div>
 		<div class="eight wide column">
-			<div id="chart_5">
+			<div id="chart_6">
 			</div>
 		</div>
 	</div>
 
   <script>
-      // var data = ([
-      //   {date: "2011-11-14T16:17:54Z", longitude: 135, latitude: 30, radius: 1, type: "tab"},
-      //   {date: "2011-11-14T16:20:19Z", longitude: 137, latitude: 25, radius: 2, type: "tab"},
-      //   {date: "2011-11-14T16:28:54Z", longitude: 139, latitude: 20, radius: 3, type: "visa"},
-      //   {date: "2011-11-14T16:30:43Z", longitude: 140, latitude: 25, radius: 4, type: "tab"},
-      //   {date: "2011-11-14T16:48:46Z", longitude: 142, latitude: 30, radius: 5, type: "tab"},
-      //   {date: "2011-11-14T16:53:41Z", longitude: 144, latitude: 35, radius: 6, type: "tab"},
-      //   {date: "2011-11-14T16:54:06Z", longitude: 146, latitude: 40, radius: 5, type: "cash"},
-      //   {date: "2011-11-14T16:58:03Z", longitude: 130, latitude: 50, radius: 4, type: "tab"},
-      //   {date: "2011-11-14T17:07:21Z", longitude: 125, latitude: 45, radius: 3, type: "tab"},
-      //   {date: "2011-11-14T17:22:59Z", longitude: 120, latitude: 40, radius: 2, type: "tab"},
-      //   {date: "2011-11-14T17:25:45Z", longitude: 150, latitude: 25, radius: 10, type: "cash"},
-      //   {date: "2011-11-14T17:29:52Z", longitude: 155, latitude: 30, radius: 7, type: "visa"}
-      // ]);
+      d3.csv("data/earthquakes_sample_2.csv", function(data) {
+			  // format our data
+			  var dtgFormat = d3.time.format("%Y-%m-%dT%H:%M:%S");
 
+			  data.forEach(function(d) {
+			    d.dtg   = dtgFormat.parse(d.origintime.substr(0,19));
+			    d.lat   = +d.latitude;
+			    d.long  = +d.longitude;
+			    d.mag   = d3.round(+d.magnitude,1);
+			    d.depth = d3.round(+d.depth,0);
+					//magnitude --> radius
+					d.radius = d3.round(+d.magnitude,1)*2.5;
+			  });
 
-
-      d3.tsv("data/earthquakes_sample.csv", function(data) {
-				//magnitude --> radius
-				Object.keys(data[0]).forEach(function (key) {
-					for(var i = 0 ; i<data.length ; i++ ){
-						data[i]["radius"]=data[i]["magnitude"]
-					}
-				});
-
-				// Object.keys(data[0]).forEach(function (key) {
-				// 	for(var i = 0 ; i<data.length ; i++ ){
-				// 		console.log(key + ":" + data[i][key]);
-				// 	}
-				// });
       	plotbubble(data);
       });
 
@@ -101,9 +90,9 @@
 					// Zoom in Japan
 					setProjection: function(element) {
 						var projection = d3.geo.equirectangular()
-							.center([170,-45])
+							.center([175,-45])
 							.rotate([0, 0])
-							.scale(1200)
+							.scale(1800)
 							.translate([element.offsetWidth / 2, element.offsetHeight / 2]);
 						var path = d3.geo.path()
 							.projection(projection);
@@ -114,7 +103,7 @@
 					// projectionConfig: {
 					//   rotation: [-150,0]
 					// },
-					height: 500, //if not null, datamaps will grab the height of 'element'
+					height: 800, //if not null, datamaps will grab the height of 'element'
 					width: 500, //if not null, datamaps will grab the width of 'element'
 					responsive: false, //if true, call `resize()` on the map object when it should adjust it's size
 					fills: {
@@ -128,7 +117,7 @@
 						borderColor: '#FFFFFF',
 					},
 					bubblesConfig: {
-		        borderWidth: 1,
+		        borderWidth: 0.5,
 		        borderOpacity: 1,
 		        borderColor: '#FFFFFF',
 		        popupOnHover: true, // True to show the popup while hovering
@@ -136,7 +125,7 @@
 		        // popupTemplate: function(geography, data) { // This function should just return a string
 		        //   return '<div class="hoverinfo"><strong>' + data.name + '</strong></div>';
 		        // },
-		        fillOpacity: 0.75,
+		        fillOpacity: 0.5,
 		        animate: true,
 		        highlightOnHover: true,
 		        highlightFillColor: '#FC8D59',
@@ -158,32 +147,35 @@
             return [d.radius];
         });
 				var dim_depth = cf.dimension(function(d) {
-						return [d.depth];
+						return [Math.round(d.depth*2)/2];
 				});
 				var dim_magnitude = cf.dimension(function(d) {
-						return [d.magnitude];
+						return [Math.round(d.magnitude*2)/2];
+				});
+				var dim_time = cf.dimension(function(d) {
+						return d3.time.hour(d.dtg);
 				});
 
 				var barChart_depth = dc.barChart('#chart_2');
 				barChart_depth
 					.width(chart_width)
-					.height(chart_height/2)
+					.height(chart_height/3)
 					.dimension(dim_depth)
 					.group(dim_depth.group().reduceCount())
 					.transitionDuration(500)
 					.centerBar(true)
-					.gap(79)
+					.gap(1)
 					.x(d3.scale.linear().domain([0,100]))
-					//.y(d3.scale.linear().domain([min_y,max_y]))
 					.renderHorizontalGridLines(true)
 					.renderVerticalGridLines(true)
 					.yAxisLabel('Counts')
 					.xAxisLabel('depth [km]')
-					.xAxis().ticks(5)
+					.xAxis().ticks(5);
 					//.yAxis().ticks(5)
 					//.elasticY(true);
 					//.xAxis().tickFormat();
 				barChart_depth
+					.elasticY(true)
 					.render()
 					.on('filtered.monitor', function(chart, filter) {
     				//filter applied
@@ -198,23 +190,22 @@
 				var barChart_magnitude = dc.barChart('#chart_3');
 				barChart_magnitude
 					.width(chart_width)
-					.height(chart_height/2)
+					.height(chart_height/3)
 					.dimension(dim_magnitude)
 					.group(dim_magnitude.group().reduceCount())
 					.transitionDuration(500)
 					.centerBar(true)
-					.gap(79)
-					.x(d3.scale.linear().domain([0,10]))
-					//.y(d3.scale.linear().domain([min_y,max_y]))
+					.gap(30)
+					.x(d3.scale.linear().domain([0,8]))
 					.renderHorizontalGridLines(true)
 					.renderVerticalGridLines(true)
 					.yAxisLabel('Counts')
-					.xAxisLabel('Magnitude')
-					.xAxis().ticks(5)
+					.xAxisLabel('magnitude')
+					.xAxis().ticks(5);
 					//.yAxis().ticks(5)
 					//.elasticY(true);
-					//.xAxis().tickFormat();
 				barChart_magnitude
+					.elasticY(true)
 					.render()
 					.on('filtered.monitor', function(chart, filter) {
     				//filter applied
@@ -226,6 +217,34 @@
 						});
 					});
 
+				var barChart_time = dc.barChart('#chart_4');
+				barChart_time
+					.width(chart_width)
+					.height(chart_height/3)
+					.dimension(dim_time)
+					.group(dim_time.group().reduceCount())
+					.transitionDuration(500)
+				  .x(d3.time.scale().domain([new Date(2017, 0, 1), new Date(2017, 0, 10)])) // scale and domain of the graph
+					.centerBar(true)
+					.gap(0)
+					.renderHorizontalGridLines(true)
+					.renderVerticalGridLines(true)
+					.yAxisLabel('Counts')
+					.xAxisLabel('time')
+					.xAxis().ticks(5);
+
+				barChart_time
+					.elasticY(true)
+					.render()
+					.on('filtered.monitor', function(chart, filter) {
+						//filter applied
+						map.bubbles(
+							dim_magnitude.top(Infinity),{
+							popupTemplate: function(geo, data) {
+								return '<div class="hoverinfo">(Lat,Lon):(' + data.latitude + ' , ' + data.longitude + ')'
+							}
+						});
+					});
 
 				// var pieChart = dc.pieChart('#chart_4');
 				//
