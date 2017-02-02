@@ -36,47 +36,40 @@
 <body>
   <!--first row-->
   <div class="ui grid" style="margin:0 0 0 0;">
-    <div class="eight wide column">
+    <div class="sixteen wide column">
       <div id="chart_1">
       </div>
-    </div>
-    <div class="eight wide column">
-      <div id="chart_2">
-				<p>Events by depth [km]</p>
-      </div>
-			<div id="chart_3">
-				<p>Events by magnitude</p>
-			</div>
-			<div id="chart_4">
-				<p>Events by hour</p>
-			</div>
     </div>
   </div>
 	<!--second row-->
 	<div class="ui grid" style="margin:0 0 0 0;">
 		<div class="eight wide column">
-			<div id="chart_5">
+			<div id="chart_2">
+				<p>Events by altitude [km]</p>
 			</div>
 		</div>
 		<div class="eight wide column">
-			<div id="chart_6">
+			<div id="chart_3">
+				<p>Events by hour</p>
+			</div>
+			<div id="chart_4">
 			</div>
 		</div>
 	</div>
 
   <script>
-      d3.csv("data/earthquakes_sample_2.csv", function(data) {
+      d3.csv("data/satellite_sample.csv", function(data) {
 			  // format our data
-			  var dtgFormat = d3.time.format("%Y-%m-%dT%H:%M:%S");
+			  var dtgFormat = d3.time.format("%Y/%m/%d %H:%M:%S");
 
 			  data.forEach(function(d) {
 			    d.dtg   = dtgFormat.parse(d.origintime.substr(0,19));
 			    d.lat   = +d.latitude;
 			    d.long  = +d.longitude;
-			    d.mag   = d3.round(+d.magnitude,1);
-			    d.depth = d3.round(+d.depth,0);
+			    // d.mag   = d3.round(+d.magnitude,1);
+			    d.altitude = d3.round(+d.altitude,0);
 					//magnitude --> radius
-					d.radius = d3.round(+d.magnitude,1)*2.5;
+					d.radius = 5;
 			  });
 
       	plotbubble(data);
@@ -88,23 +81,50 @@
 					element : document.getElementById('chart_1'),
 					scope   : "world",
 					// Zoom in Japan
-					setProjection: function(element) {
-						var projection = d3.geo.equirectangular()
-							.center([175,-45])
-							.rotate([0, 0])
-							.scale(1800)
-							.translate([element.offsetWidth / 2, element.offsetHeight / 2]);
-						var path = d3.geo.path()
-							.projection(projection);
-
-						return {path: path, projection: projection};
-					},
-					// projection: 'orthographic', //style of projection to be used. try 'mercator','equirectangular','orthographic'
-					// projectionConfig: {
-					//   rotation: [-150,0]
+					// setProjection: function(element) {
+						// var projection = d3.geo.orthographic()
+						// 	.center([175,-45])
+						// 	.rotate([0, 0])
+						// 	.scale(500)
+						// 	.translate([element.offsetWidth / 2, element.offsetHeight / 2]);
+						// var path = d3.geo.path()
+						// 	.projection(projection);
+						//
+						// return {path: path, projection: projection};
 					// },
-					height: 800, //if not null, datamaps will grab the height of 'element'
-					width: 500, //if not null, datamaps will grab the width of 'element'
+					projection: 'equirectangular', //style of projection to be used. try 'mercator','equirectangular','orthographic'
+					// projectionConfig: {
+					// 	rotation: [175,45]
+					// },
+					// done: function(datamap) {
+          //   datamap.svg.call(d3.behavior.zoom().on("zoom", redraw));
+						// datamap.svg.call(d3.behavior.drag().on('drag',drag));
+						// function drag() {
+						// 		var rotation = map.projection.rotate();
+						// 		var p = d3.mouse(this);
+						// 		var lambda = d3.scale.linear()
+						// 				.domain([0, 800])
+						// 				.range([-180, 180]);
+						//
+						// 		var phi = d3.scale.linear()
+						// 				.domain([0, 800])
+						// 				.range([90, -90]);
+						//
+						// 		rotation[0] += lambda(p[0]);
+						// 		rotation[1] -= phi(p[1]);
+						// 		if (rotation[1] > 90)   rotation[1] = 90;
+						// 		if (rotation[1] < -90)  rotation[1] = -90;
+						// 		if (rotation[0] >= 180) rotation[0] -= 360;
+						// 		console.log(rotation)
+						// 		map.projection.rotate(rotation);
+						// }
+					// 	function redraw() {
+          //   	datamap.svg.selectAll("g").attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+          //   }
+					//
+					// },
+					height: 400, //if not null, datamaps will grab the height of 'element'
+					width: 1000, //if not null, datamaps will grab the width of 'element'
 					responsive: false, //if true, call `resize()` on the map object when it should adjust it's size
 					fills: {
 						defaultFill: '#6f6f6f' //the keys in this object map to the "fillKey" of [data] or [bubbles]
@@ -138,6 +158,58 @@
     			}
 				});
 
+				// console.log(map.svg)
+				// $("#chart_1").datamaps({setProjection: function(element) {
+        //   var projection = d3.geo.equirectangular()
+        //     .center([-72, 43])
+        //     .rotate([4.4, 0])
+        //     .scale(4000)
+        //     .translate([element.offsetWidth / 2, element.offsetHeight / 2]);
+        //   var path = d3.geo.path()
+        //     .projection(projection);
+				//
+        //   return {path: path, projection: projection};
+        // 	}
+				// })
+				// function drag(){
+				// 	var rotation = map.projection.rotate();
+				// 	var p = d3.mouse(this);
+				// 	var lambda = d3.scale.linear()
+				// 			.domain([0, 800])
+				// 			.range([-180, 180]);
+				//
+				// 	var phi = d3.scale.linear()
+				// 			.domain([0, 800])
+				// 			.range([90, -90]);
+				//
+				// 	rotation[0] += lambda(p[0]);
+				// 	rotation[1] -= phi(p[1]);
+				// 	if (rotation[1] > 90)   rotation[1] = 90;
+				// 	if (rotation[1] < -90)  rotation[1] = -90;
+				// 	if (rotation[0] >= 180) rotation[0] -= 360;
+				// 	console.log(rotation)
+				// 	console.log($("#chart_1").datamaps.projection)
+
+					// var dx = d3.event.dx;
+					// var dy = d3.event.dy;
+					//
+					// var rotation = map.projection.rotate();
+					// // var radius = map.svg.scale();
+					// var scale = d3.scale.linear()
+					// 		.domain([-1 * 10, 10])
+					// 		.range([-90, 90]);
+					// var degX = scale(dx);
+					// var degY = scale(dy);
+					//
+					// rotation[0] += degX;
+					// rotation[1] -= degY;
+					// if (rotation[1] > 90)   rotation[1] = 90;
+					// if (rotation[1] < -90)  rotation[1] = -90;
+					// if (rotation[0] >= 180) rotation[0] -= 360;
+					// map.projection.rotate(rotation);
+					// console.log(rotation)
+					// console.log(map)
+				// };
 				var chart_width=500;
 				var chart_height=500;
         cf = crossfilter(data);
@@ -146,85 +218,85 @@
         var dim_radius = cf.dimension(function(d) {
             return [d.radius];
         });
-				var dim_depth = cf.dimension(function(d) {
-						return [Math.round(d.depth*2)/2];
+				var dim_altitude = cf.dimension(function(d) {
+						return [Math.round(d.altitude*2)/2];
 				});
-				var dim_magnitude = cf.dimension(function(d) {
-						return [Math.round(d.magnitude*2)/2];
-				});
+				// var dim_magnitude = cf.dimension(function(d) {
+				// 		return [Math.round(d.magnitude*2)/2];
+				// });
 				var dim_time = cf.dimension(function(d) {
 						return d3.time.hour(d.dtg);
 				});
 
-				var barChart_depth = dc.barChart('#chart_2');
-				barChart_depth
+				var barChart_altitude = dc.barChart('#chart_2');
+				barChart_altitude
 					.width(chart_width)
 					.height(chart_height/3)
-					.dimension(dim_depth)
-					.group(dim_depth.group().reduceCount())
+					.dimension(dim_altitude)
+					.group(dim_altitude.group().reduceCount())
 					.transitionDuration(500)
 					.centerBar(true)
 					.gap(1)
-					.x(d3.scale.linear().domain([0,100]))
+					.x(d3.scale.linear().domain([400,800]))
 					.renderHorizontalGridLines(true)
 					.renderVerticalGridLines(true)
 					.yAxisLabel('Counts')
-					.xAxisLabel('depth [km]')
+					.xAxisLabel('altitude [km]')
 					.xAxis().ticks(5);
 					//.yAxis().ticks(5)
 					//.elasticY(true);
 					//.xAxis().tickFormat();
-				barChart_depth
+				barChart_altitude
 					.elasticY(true)
 					.render()
 					.on('filtered.monitor', function(chart, filter) {
     				//filter applied
 						map.bubbles(
-							dim_depth.top(Infinity),{
+							dim_altitude.top(Infinity),{
 							popupTemplate: function(geo, data) {
 								return '<div class="hoverinfo">(Lat,Lon):(' + data.latitude + ' , ' + data.longitude + ')'
 							}
 						});
 					});
 
-				var barChart_magnitude = dc.barChart('#chart_3');
-				barChart_magnitude
-					.width(chart_width)
-					.height(chart_height/3)
-					.dimension(dim_magnitude)
-					.group(dim_magnitude.group().reduceCount())
-					.transitionDuration(500)
-					.centerBar(true)
-					.gap(30)
-					.x(d3.scale.linear().domain([0,8]))
-					.renderHorizontalGridLines(true)
-					.renderVerticalGridLines(true)
-					.yAxisLabel('Counts')
-					.xAxisLabel('magnitude')
-					.xAxis().ticks(5);
-					//.yAxis().ticks(5)
-					//.elasticY(true);
-				barChart_magnitude
-					.elasticY(true)
-					.render()
-					.on('filtered.monitor', function(chart, filter) {
-    				//filter applied
-						map.bubbles(
-							dim_magnitude.top(Infinity),{
-							popupTemplate: function(geo, data) {
-								return '<div class="hoverinfo">(Lat,Lon):(' + data.latitude + ' , ' + data.longitude + ')'
-							}
-						});
-					});
+				// var barChart_magnitude = dc.barChart('#chart_3');
+				// barChart_magnitude
+				// 	.width(chart_width)
+				// 	.height(chart_height/3)
+				// 	.dimension(dim_magnitude)
+				// 	.group(dim_magnitude.group().reduceCount())
+				// 	.transitionDuration(500)
+				// 	.centerBar(true)
+				// 	.gap(30)
+				// 	.x(d3.scale.linear().domain([0,8]))
+				// 	.renderHorizontalGridLines(true)
+				// 	.renderVerticalGridLines(true)
+				// 	.yAxisLabel('Counts')
+				// 	.xAxisLabel('magnitude')
+				// 	.xAxis().ticks(5);
+				// 	//.yAxis().ticks(5)
+				// 	//.elasticY(true);
+				// barChart_magnitude
+				// 	.elasticY(true)
+				// 	.render()
+				// 	.on('filtered.monitor', function(chart, filter) {
+    		// 		//filter applied
+				// 		map.bubbles(
+				// 			dim_magnitude.top(Infinity),{
+				// 			popupTemplate: function(geo, data) {
+				// 				return '<div class="hoverinfo">(Lat,Lon):(' + data.latitude + ' , ' + data.longitude + ')'
+				// 			}
+				// 		});
+				// 	});
 
-				var barChart_time = dc.barChart('#chart_4');
+				var barChart_time = dc.barChart('#chart_3');
 				barChart_time
 					.width(chart_width)
 					.height(chart_height/3)
 					.dimension(dim_time)
 					.group(dim_time.group().reduceCount())
 					.transitionDuration(500)
-				  .x(d3.time.scale().domain([new Date(2017, 0, 1), new Date(2017, 0, 10)])) // scale and domain of the graph
+				  .x(d3.time.scale().domain([new Date(2017, 0, 1), new Date(2017, 1, 1)])) // scale and domain of the graph
 					.centerBar(true)
 					.gap(0)
 					.renderHorizontalGridLines(true)
@@ -239,7 +311,7 @@
 					.on('filtered.monitor', function(chart, filter) {
 						//filter applied
 						map.bubbles(
-							dim_magnitude.top(Infinity),{
+							dim_time.top(Infinity),{
 							popupTemplate: function(geo, data) {
 								return '<div class="hoverinfo">(Lat,Lon):(' + data.latitude + ' , ' + data.longitude + ')'
 							}
