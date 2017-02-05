@@ -1,4 +1,4 @@
-
+﻿
 
 <!DOCTYPE html>
 <html lang="ja">
@@ -58,9 +58,9 @@
 	</div>
 
   <script>
-      d3.csv("data/satellite_sample.csv", function(data) {
+      d3.csv("data/satellite_sample2.csv", function(data) {
 			  // format our data
-			  var dtgFormat = d3.time.format("%Y/%m/%d %H:%M:%S");
+			  var dtgFormat = d3.time.format("%Y-%m-%d %H:%M:%S");
 
 			  data.forEach(function(d) {
 			    d.dtg   = dtgFormat.parse(d.origintime.substr(0,19));
@@ -237,7 +237,7 @@
 					.transitionDuration(500)
 					.centerBar(true)
 					.gap(1)
-					.x(d3.scale.linear().domain([400,800]))
+					.x(d3.scale.linear().domain([630,660]))
 					.renderHorizontalGridLines(true)
 					.renderVerticalGridLines(true)
 					.yAxisLabel('Counts')
@@ -296,7 +296,7 @@
 					.dimension(dim_time)
 					.group(dim_time.group().reduceCount())
 					.transitionDuration(500)
-				  .x(d3.time.scale().domain([new Date(2017, 0, 1), new Date(2017, 1, 1)])) // scale and domain of the graph
+				  .x(d3.time.scale().domain([new Date(2017, 0, 1), new Date(2017, 0, 2)])) // scale and domain of the graph
 					.centerBar(true)
 					.gap(0)
 					.renderHorizontalGridLines(true)
